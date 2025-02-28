@@ -10,7 +10,6 @@ from concrete.ml.sklearn.linear_model import SGDRegressor
 import mlflow
 from itertools import product
 import datetime
-import numpy as np
 
 def exp_sgd_regressor(X_train, y_train, X_test, y_test):
     # Configurations - Hyperparameter grid for SGDRegressor

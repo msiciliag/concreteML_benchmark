@@ -10,7 +10,6 @@ from concrete.ml.sklearn.linear_model import Lasso
 import mlflow
 from itertools import product
 import datetime
-import numpy as np
 
 def exp_lasso(X_train, y_train, X_test, y_test):
     # Configurations - Hyperparameter grid for Lasso

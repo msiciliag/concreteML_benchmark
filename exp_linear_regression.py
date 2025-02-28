@@ -10,7 +10,6 @@ from concrete.ml.sklearn.linear_model import LinearRegression
 import mlflow
 from itertools import product
 import datetime
-import numpy as np
 
 
 def exp_linear_regression(X_train, y_train, X_test, y_test):
