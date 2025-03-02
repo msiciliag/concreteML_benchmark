@@ -16,7 +16,7 @@ def exp_elastic_net(X_train, y_train, X_test, y_test):
     alpha_values = [0.1, 1.0, 10.0]
     l1_ratio_values = [0.1, 0.5, 0.9]
     fit_intercept_values = [True, False]
-    precompute_values = [False, True, 'auto'] # Include 'auto' and True/False
+    precompute_values = [False] #? gram matrix precomputed?
     max_iter_values = [1000, 2000]
     tol_values = [1e-4, 1e-3, 1e-2]
     positive_values = [False, True]
