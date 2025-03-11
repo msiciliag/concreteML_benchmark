@@ -1,4 +1,5 @@
 import yaml
+import random
 import time
 import click
 import platform
@@ -6,7 +7,7 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from multiprocessing import Pool
-from itertools import repeat, product
+from itertools import repeat
 import importlib
 import os
 import json
@@ -14,6 +15,7 @@ import mlflow
 import importlib.metadata
 
 DEFAULT_PROGRESS_FILE = "progress.json"
+RANDOM_SEED = 42
 
 def load_progress(progress_file):
     if os.path.exists(progress_file):
@@ -61,7 +63,6 @@ def log_system_info():
         "processor": platform.processor(),
         "ram": f"{round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024. ** 3), 2)} GB"
     }
-    #print(system_info)
     for key, value in system_info.items():
         mlflow.log_param(key, value)
 
@@ -91,15 +92,18 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
     names = task_config_names + concreteml_model_config_names + model_config_names
     values = [elem[1] for elem in task_configs + concreteml_model_configs + model_configs]
     
-    for vals in product(*values):
+    # Set random seed for reproducibility
+    random.seed(RANDOM_SEED)
+    
+    for _ in range(10):  # Adjust the number of random combinations you want to test
+        vals = [random.choice(val) for val in values]
         named_values = dict(zip(names, vals))
         config_key = str(tuple(named_values.items()))
         
         if config_key in progress:
             print(f"Skipping already tested configuration: {named_values}")
             continue
-        print(f"Running experiment with configuration: {named_values}")
-
+        
         results = {}
 
         try:
@@ -110,7 +114,8 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
             dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
             X, y = make_classification(**dataset_config)
             X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-                    
+            
+            
             experiment_name = f"{model_config['name']} Benchmark"
             mlflow.set_experiment(experiment_name)
             
@@ -121,13 +126,14 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 log_system_info()
                 log_library_versions()
                 
-
+                # Train clear model
                 tic = time.perf_counter()
                 model.fit(X_train, y_train)
                 toc = time.perf_counter()
                 results["train_time_clear"] = toc - tic
                 mlflow.log_metric("train_time_clear", results["train_time_clear"])
                 
+                # Predictions with clear model
                 tic = time.perf_counter()
                 y_pred_clear = model.predict(X_test)
                 toc = time.perf_counter()
@@ -141,19 +147,21 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 results["auc_clear"] = roc_auc_score(y_test, y_pred_clear)
                 mlflow.log_metric("auc_clear", results["auc_clear"])
                 
-
+                # Train FHE model
                 tic = time.perf_counter()
                 fhe_model.fit(X_train, y_train)
                 toc = time.perf_counter()
                 results["train_time_fhe"] = toc - tic
                 mlflow.log_metric("train_time_fhe", results["train_time_fhe"])
                 
+                # Compile FHE model
                 tic = time.perf_counter()
                 fhe_model.compile(X_train)
                 toc = time.perf_counter()
                 results["compilation_time"] = toc - tic
                 mlflow.log_metric("compilation_time", results["compilation_time"])
                 
+                # Predictions with FHE model
                 tic = time.perf_counter()
                 y_pred_fhe = fhe_model.predict(X_test, fhe="execute")
                 toc = time.perf_counter()
@@ -167,7 +175,7 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 results["auc_fhe"] = roc_auc_score(y_test, y_pred_fhe)
                 mlflow.log_metric("auc_fhe", results["auc_fhe"])
                 
-
+                # Log differences
                 results["accuracy_diff"] = results["accuracy_fhe"] - results["accuracy_clear"]
                 mlflow.log_metric("accuracy_diff", results["accuracy_diff"])
                 results["f1_diff"] = results["f1_fhe"] - results["f1_clear"]
@@ -177,14 +185,13 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 results["prediction_time_diff"] = results["prediction_time_fhe"] - results["prediction_time_clear"]
                 mlflow.log_metric("prediction_time_diff", results["prediction_time_diff"])
 
-                #print(results)
+                print(results)
                 
         except Exception as e:
             print(f"Error with configuration {named_values}: {e}")
             continue
 
         finally:
-
             progress[config_key] = results
             save_progress(progress, progress_file)
 
