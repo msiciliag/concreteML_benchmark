@@ -8,10 +8,10 @@ ConcreteML provides tools for creating machine learning models that can perform 
 
 ## Features
 
-- Benchmarks for various machine learning models (linear models, TODO: tree-based models, etc)
+- Benchmarks for various machine learning models (linear models, SGD classifiers)
 - Performance comparisons between encrypted and unencrypted inference
 - Accuracy measurements across different encryption parameters
-- TODO: Resource utilization metrics (memory, CPU, compilation time)
+- Resource utilization metrics (training time, compilation time, prediction time)
 
 ## Getting Started
 
@@ -20,27 +20,26 @@ ConcreteML provides tools for creating machine learning models that can perform 
 git clone https://github.com/msiciliag/concreteML_benchmark.git
 cd concreteML_benchmark
 
-# Create a virtual environment
-python -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies using uv
+uv sync
 
 # Run benchmarks
+uv run main.py --help
 ```
+
+## Configuration Files
+
+The benchmark uses YAML configuration files to define experiments:
+
+- `exp_logistic_regression.yml`: Benchmarks for Logistic Regression models
+- `exp_sdg_classifier.yml`: Benchmarks for SGD Classifier models
+- `example_test_config.yaml`: Minimal example for testing
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.12+
 - ConcreteML
 - Scikit-learn
-- MLFlow
+- PyYAML
+- Click
 
-## License
-
-[License information]
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
