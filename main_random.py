@@ -68,7 +68,7 @@ def log_system_info():
 
 def log_library_versions():
     """Log the versions of the main libraries used"""
-    libraries = ["scikit-learn", "concrete-ml", "mlflow"]
+    libraries = ["scikit-learn", "concrete-ml"]
     for library in libraries:
         try:
             version = importlib.metadata.version(library)
