@@ -1,0 +1,87 @@
+task:
+  type: 'classification'
+  metrics:
+    - metric:
+        name: 'accuracy'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'accuracy_score'
+    - metric:
+        name: 'f1'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'f1_score'
+    - metric:
+        name: 'roc_auc'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'roc_auc_score'
+  data: 
+    type: 'synthetic'
+    params:
+      - param:
+          name: 'n_samples'
+          type: 'int'
+          values: [100, 500, 1000]
+      - param:
+          name: 'n_features'
+          type: 'int'
+          values: [5, 10, 20]
+      - param:
+          name: 'n_informative'
+          type: 'int'
+          values: [2, 5]
+      - param:
+          name: 'n_redundant'
+          type: 'int'
+          values: [0, 1, 2]
+      - param:
+          name: 'random_state'
+          type: 'int'
+          values: [42]
+
+concreteml:
+  model_params:
+    - param: 
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 8
+        step: 1
+
+models:
+  - model: 
+      name: 'LogisticRegression'
+      module_name: 'sklearn.linear_model'
+      fhe_name: 'LogisticRegression'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+        - param:
+            name: 'solver'
+            type: 'str'
+            values: ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+        - param:
+            name: 'penalty'
+            type: 'str'
+            values: ['l1', 'l2', 'elasticnet', 'none']
+        - param:
+            name: 'multi_class'
+            type: 'str'
+            values: ['ovr', 'multinomial', 'auto']
+        - param:
+            name: 'C'
+            type: 'float'
+            values: [0.01, 0.1, 1, 10, 100]
+        - param:
+            name: 'fit_intercept'
+            type: 'bool'
+            values: [True, False]
+        - param:
+            name: 'max_iter'
+            type: 'int'
+            values: [100, 200, 300]
+        - param:
+            name: 'tol'
+            type: 'float'
+            values: [0.0001, 0.001, 0.01]
+        - param:
+            name: 'random_state'
+            type: 'int'
+            values: [42]

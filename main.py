@@ -75,6 +75,43 @@ def log_library_versions():
         except importlib.metadata.PackageNotFoundError:
             mlflow.log_param(f"{library}_version", "not installed")
 
+def error_to_metric(error_message):
+    """Convert error message to a numeric error code for MLflow metrics"""
+    error_codes = {
+        "solver": 1,
+        "penalty": 2,
+        "multi_class": 3,
+        "features": 4,
+        "compilation": 5,
+        "memory": 6,
+        "convergence": 7,
+        "value": 8,
+        "type": 9,
+        "other": 99
+    }
+    
+    error_text = str(error_message).lower()
+    if "solver" in error_text:
+        return error_codes["solver"]
+    elif "penalty" in error_text:
+        return error_codes["penalty"]
+    elif "multi_class" in error_text or "multinomial" in error_text:
+        return error_codes["multi_class"]
+    elif "features" in error_text or "n_informative" in error_text:
+        return error_codes["features"]
+    elif "compile" in error_text:
+        return error_codes["compilation"]
+    elif "memory" in error_text:
+        return error_codes["memory"]
+    elif "converge" in error_text or "iteration" in error_text:
+        return error_codes["convergence"]
+    elif "value" in error_text:
+        return error_codes["value"]
+    elif "type" in error_text:
+        return error_codes["type"]
+    else:
+        return error_codes["other"]
+
 def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: dict, progress_file: str):
     """Run an experiment with the given configurations"""
     task_configs = [(elem["param"]["name"], expand_config_param(elem["param"]))
@@ -102,19 +139,20 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
 
         results = {}
 
-        try:
-            model, fhe_model = instantiate_models(model_config=model_config,
-                                                  param_config={k: v for k, v in named_values.items() if k in model_config_names},
-                                                  fhe_config={k: v for k, v in named_values.items() if k in concreteml_model_config_names})
-            
-            dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
-            X, y = make_classification(**dataset_config)
-            X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-                    
-            experiment_name = f"{model_config['name']} Benchmark"
-            mlflow.set_experiment(experiment_name)
-            
-            with mlflow.start_run(nested=True):
+        with mlflow.start_run():
+
+            try:
+                model, fhe_model = instantiate_models(model_config=model_config,
+                                                    param_config={k: v for k, v in named_values.items() if k in model_config_names},
+                                                    fhe_config={k: v for k, v in named_values.items() if k in concreteml_model_config_names})
+                
+                dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
+                X, y = make_classification(**dataset_config)
+                X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+                        
+                experiment_name = f"{model_config['name']} Benchmark"
+                mlflow.set_experiment(experiment_name)
+                
                 for param_name, param_value in named_values.items():
                     mlflow.log_param(param_name, param_value)
 
@@ -178,15 +216,24 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 mlflow.log_metric("prediction_time_diff", results["prediction_time_diff"])
 
                 #print(results)
+
+                mlflow.end_run(status="FINISHED")
+
+            except Exception as e:
+                error_msg = str(e)
+                print(f"Error with configuration {named_values}: {e}")
                 
-        except Exception as e:
-            print(f"Error with configuration {named_values}: {e}")
-            continue
+                mlflow.set_tag("error_message", error_msg)
+                mlflow.set_tag("error_type", type(e).__name__)
+                
+                mlflow.end_run(status="FAILED")
+                continue
 
-        finally:
+            finally:
 
-            progress[config_key] = results
-            save_progress(progress, progress_file)
+                progress[config_key] = results
+                save_progress(progress, progress_file)
+
 
 @click.command()
 @click.argument('config_file', type=click.Path(exists=True))

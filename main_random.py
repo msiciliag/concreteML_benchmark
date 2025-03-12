@@ -14,8 +14,9 @@ import json
 import mlflow
 import importlib.metadata
 
-DEFAULT_PROGRESS_FILE = "progress.json"
-RANDOM_SEED = 42
+DEFAULT_PROGRESS_FILE = "progress_random.json"
+DEFAULT_RANDOM_SEED = 42
+DEFAULT_EXP_NUMBER = 20
 
 def load_progress(progress_file):
     if os.path.exists(progress_file):
@@ -76,7 +77,44 @@ def log_library_versions():
         except importlib.metadata.PackageNotFoundError:
             mlflow.log_param(f"{library}_version", "not installed")
 
-def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: dict, progress_file: str):
+def error_to_metric(error_message):
+    """Convert error message to a numeric error code for MLflow metrics"""
+    error_codes = {
+        "solver": 1,
+        "penalty": 2,
+        "multi_class": 3,
+        "features": 4,
+        "compilation": 5,
+        "memory": 6,
+        "convergence": 7,
+        "value": 8,
+        "type": 9,
+        "other": 99
+    }
+    
+    error_text = str(error_message).lower()
+    if "solver" in error_text:
+        return error_codes["solver"]
+    elif "penalty" in error_text:
+        return error_codes["penalty"]
+    elif "multi_class" in error_text or "multinomial" in error_text:
+        return error_codes["multi_class"]
+    elif "features" in error_text or "n_informative" in error_text:
+        return error_codes["features"]
+    elif "compile" in error_text:
+        return error_codes["compilation"]
+    elif "memory" in error_text:
+        return error_codes["memory"]
+    elif "converge" in error_text or "iteration" in error_text:
+        return error_codes["convergence"]
+    elif "value" in error_text:
+        return error_codes["value"]
+    elif "type" in error_text:
+        return error_codes["type"]
+    else:
+        return error_codes["other"]
+    
+def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: dict, progress_file: str, exp_number: int):
     """Run an experiment with the given configurations"""
     task_configs = [(elem["param"]["name"], expand_config_param(elem["param"]))
                     for elem in task_config["data"]["params"]]
@@ -91,35 +129,34 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
     
     names = task_config_names + concreteml_model_config_names + model_config_names
     values = [elem[1] for elem in task_configs + concreteml_model_configs + model_configs]
-    
-    # Set random seed for reproducibility
-    random.seed(RANDOM_SEED)
-    
-    for _ in range(10):  # Adjust the number of random combinations you want to test
+        
+    for i in range(exp_number):
+
+        print(f"\nExperiment number {i+1} of the run\n")
         vals = [random.choice(val) for val in values]
         named_values = dict(zip(names, vals))
         config_key = str(tuple(named_values.items()))
         
         if config_key in progress:
-            print(f"Skipping already tested configuration: {named_values}")
+            print(f"Skipping already tested configuration: {named_values}\n")
             continue
         
         results = {}
+        with mlflow.start_run():
 
-        try:
-            model, fhe_model = instantiate_models(model_config=model_config,
-                                                  param_config={k: v for k, v in named_values.items() if k in model_config_names},
-                                                  fhe_config={k: v for k, v in named_values.items() if k in concreteml_model_config_names})
-            
-            dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
-            X, y = make_classification(**dataset_config)
-            X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-            
-            
-            experiment_name = f"{model_config['name']} Benchmark"
-            mlflow.set_experiment(experiment_name)
-            
-            with mlflow.start_run(nested=True):
+            try:
+                model, fhe_model = instantiate_models(model_config=model_config,
+                                                    param_config={k: v for k, v in named_values.items() if k in model_config_names},
+                                                    fhe_config={k: v for k, v in named_values.items() if k in concreteml_model_config_names})
+                
+                dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
+                X, y = make_classification(**dataset_config)
+                X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+                
+                
+                experiment_name = f"{model_config['name']} Random Benchmark"
+                mlflow.set_experiment(experiment_name)
+                
                 for param_name, param_value in named_values.items():
                     mlflow.log_param(param_name, param_value)
 
@@ -186,20 +223,31 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 mlflow.log_metric("prediction_time_diff", results["prediction_time_diff"])
 
                 print(results)
-                
-        except Exception as e:
-            print(f"Error with configuration {named_values}: {e}")
-            continue
+                mlflow.end_run(status="FINISHED")
 
-        finally:
-            progress[config_key] = results
-            save_progress(progress, progress_file)
+            except Exception as e:
+                error_msg = str(e)
+                print(f"Error with configuration {named_values}: {e}")
+                
+                mlflow.set_tag("error_message", error_msg)
+                mlflow.set_tag("error_type", type(e).__name__)
+                
+                mlflow.end_run(status="FAILED")
+                continue
+
+            finally:
+
+                progress[config_key] = results
+                save_progress(progress, progress_file)
+
 
 @click.command()
 @click.argument('config_file', type=click.Path(exists=True))
 @click.argument('progress_file', type=click.Path(), required=False, default=DEFAULT_PROGRESS_FILE)
+@click.option('--exp-number', type=int, required=False, default=DEFAULT_EXP_NUMBER)
+@click.option('--random-seed', type=int, required=False, default=DEFAULT_RANDOM_SEED)
 @click.option('--clear-progress', is_flag=True, help='Clear progress and start from scratch.')
-def main(config_file, progress_file, clear_progress):
+def main(config_file, progress_file, exp_number, random_seed, clear_progress):
     """Main function to run the experiments"""
     if clear_progress and os.path.exists(progress_file):
         os.remove(progress_file)
@@ -210,9 +258,11 @@ def main(config_file, progress_file, clear_progress):
     configs = list(zip(repeat(config["task"]), repeat(config["concreteml"]), model_configs))
     
     progress = load_progress(progress_file)
+
+    random.seed(random_seed)
     
     with Pool(n_models) as p:
-        p.starmap(experiment, [(task, concreteml, model, progress, progress_file) for task, concreteml, model in configs])
+        p.starmap(experiment, [(task, concreteml, model, progress, progress_file, exp_number) for task, concreteml, model in configs])
 
 if __name__ == '__main__':
     main()

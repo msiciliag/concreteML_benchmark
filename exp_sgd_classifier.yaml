@@ -1,0 +1,107 @@
+task:
+  type: 'classification'
+  metrics:
+    - metric:
+        name: 'accuracy'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'accuracy_score'
+    - metric:
+        name: 'f1'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'f1_score'
+    - metric:
+        name: 'roc_auc'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'roc_auc_score'
+  data: 
+    type: 'synthetic'
+    params:
+      - param:
+          name: 'n_samples'
+          type: 'int'
+          values: [100, 500, 1000]
+      - param:
+          name: 'n_features'
+          type: 'int'
+          values: [5, 10, 20]
+      - param:
+          name: 'n_informative'
+          type: 'int'
+          values: [2, 5]
+      - param:
+          name: 'n_redundant'
+          type: 'int'
+          values: [0, 1, 2]
+      - param:
+          name: 'random_state'
+          type: 'int'
+          values: [42]
+
+concreteml:
+  model_params:
+    - param: 
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 8
+        step: 1
+
+models:
+  - model: 
+      name: 'SGDClassifier'
+      module_name: 'sklearn.linear_model'
+      fhe_name: 'SGDClassifier'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+        - param:
+            name: 'loss'
+            type: 'str'
+            values: ['hinge', 'log', 'modified_huber', 'squared_hinge', 'perceptron']
+        - param:
+            name: 'penalty'
+            type: 'str'
+            values: ['l1', 'l2', 'elasticnet']
+        - param:
+            name: 'alpha'
+            type: 'float'
+            values: [0.0001, 0.001, 0.01, 0.1]
+        - param:
+            name: 'fit_intercept'
+            type: 'bool'
+            values: [True, False]
+        - param:
+            name: 'max_iter'
+            type: 'int'
+            values: [1000, 2000, 3000]
+        - param:
+            name: 'tol'
+            type: 'float'
+            values: [0.0001, 0.001, 0.01]
+        - param:
+            name: 'learning_rate'
+            type: 'str'
+            values: ['constant', 'optimal', 'invscaling', 'adaptive']
+        - param:
+            name: 'eta0'
+            type: 'float'
+            values: [0.01, 0.1, 1]
+        - param:
+            name: 'power_t'
+            type: 'float'
+            values: [0.5, 0.75]
+        - param:
+            name: 'early_stopping'
+            type: 'bool'
+            values: [True, False]
+        - param:
+            name: 'validation_fraction'
+            type: 'float'
+            values: [0.1, 0.2, 0.3]
+        - param:
+            name: 'n_iter_no_change'
+            type: 'int'
+            values: [5, 10, 15]
+        - param:
+            name: 'random_state'
+            type: 'int'
+            values: [42]

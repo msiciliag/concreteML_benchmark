@@ -12,6 +12,7 @@ ConcreteML provides tools for creating machine learning models that can perform 
 - Performance comparisons between encrypted and unencrypted inference
 - Accuracy measurements across different encryption parameters
 - Resource utilization metrics (training time, compilation time, prediction time)
+- Error logging on experiment tags
 
 ## Getting Started
 
@@ -25,6 +26,8 @@ uv sync
 
 # Run benchmarks
 uv run main.py --help
+# OR
+uv run main_random.py --help
 ```
 
 ## Configuration Files
