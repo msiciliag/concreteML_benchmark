@@ -34,8 +34,8 @@ uv run main_random.py --help
 
 The benchmark uses YAML configuration files to define experiments:
 
-- `exp_logistic_regression.yml`: Benchmarks for Logistic Regression models
-- `exp_sdg_classifier.yml`: Benchmarks for SGD Classifier models
+- `exp_logistic_regression.yaml`: Benchmarks for Logistic Regression models
+- `exp_sdg_classifier.yaml`: Benchmarks for SGD Classifier models
 - `example_test_config.yaml`: Minimal example for testing
 
 ## Requirements
@@ -46,3 +46,9 @@ The benchmark uses YAML configuration files to define experiments:
 - PyYAML
 - Click
 - MLflow
+
+## TODO
+- Complete README.
+- KV store and hash implementation for progress.
+- Fix system specs logging.
+- Rewrite value list comprehensions over hyperparameters for readability.
