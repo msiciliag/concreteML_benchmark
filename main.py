@@ -75,43 +75,6 @@ def log_library_versions():
         except importlib.metadata.PackageNotFoundError:
             mlflow.log_param(f"{library}_version", "not installed")
 
-def error_to_metric(error_message):
-    """Convert error message to a numeric error code for MLflow metrics"""
-    error_codes = {
-        "solver": 1,
-        "penalty": 2,
-        "multi_class": 3,
-        "features": 4,
-        "compilation": 5,
-        "memory": 6,
-        "convergence": 7,
-        "value": 8,
-        "type": 9,
-        "other": 99
-    }
-    
-    error_text = str(error_message).lower()
-    if "solver" in error_text:
-        return error_codes["solver"]
-    elif "penalty" in error_text:
-        return error_codes["penalty"]
-    elif "multi_class" in error_text or "multinomial" in error_text:
-        return error_codes["multi_class"]
-    elif "features" in error_text or "n_informative" in error_text:
-        return error_codes["features"]
-    elif "compile" in error_text:
-        return error_codes["compilation"]
-    elif "memory" in error_text:
-        return error_codes["memory"]
-    elif "converge" in error_text or "iteration" in error_text:
-        return error_codes["convergence"]
-    elif "value" in error_text:
-        return error_codes["value"]
-    elif "type" in error_text:
-        return error_codes["type"]
-    else:
-        return error_codes["other"]
-
 def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: dict, progress_file: str):
     """Run an experiment with the given configurations"""
     task_configs = [(elem["param"]["name"], expand_config_param(elem["param"]))
