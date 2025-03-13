@@ -1,0 +1,66 @@
+task:
+  data:
+    params:
+      - param:
+          name: 'n_samples'
+          type: 'int'
+          min: 100
+          max: 1000
+          step: 100
+      - param:
+          name: 'n_features'
+          type: 'int'
+          min: 20
+          max: 101
+          step: 10
+      - param:
+          name: 'n_informative'
+          type: 'int'
+          min: 2
+          max: 11
+          step: 1
+      - param:
+          name: 'n_redundant'
+          type: 'int'
+          min: 0
+          max: 6
+          step: 1
+      - param:
+          name: 'random_state'
+          type: 'int'
+          values: [42]
+concreteml:
+  model_params:
+    - param:
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 5
+        step: 1
+models:
+  - model:
+      name: 'DecisionTreeClassifier'
+      module_name: 'sklearn.tree'
+      fhe_name: 'DecisionTreeClassifier'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params:
+        - param:
+            name: 'max_depth'
+            type: 'int'
+            min: 5
+            max: 101
+            step: 5
+        - param:
+            name: 'max_leaf_nodes'
+            type: 'int'
+            min: 5
+            max: 101
+            step: 5
+        - param:
+            name: 'criterion'
+            type: 'str'
+            values: ['gini', 'entropy', 'log_loss']
+        - param:
+            name: 'random_state'
+            type: 'int'
+            values: [42]

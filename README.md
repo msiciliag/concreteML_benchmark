@@ -48,7 +48,19 @@ The benchmark uses YAML configuration files to define experiments:
 - MLflow
 
 ## TODO
+
+### *Urgent*
+- Implement a *KV store* and hash mechanism for progress tracking to avoid delays caused by large *JSON files* during extensive executions.
+- Add support for *neural networks*, ensuring differentiation between FHE and clear models during the fit process (quantization applied during fitting).
+- Provide a method to vary hyperparameters when the fit() function is called for *neural networks*.
+
+### Least urgent
 - Complete README.
-- KV store and hash implementation for progress.
 - Fix system specs logging.
 - Rewrite value list comprehensions over hyperparameters for readability.
+
+
+
+## *_Caution_*
+
+- ccp_alpha hyperparameter on dtclassifier fhe is not available
