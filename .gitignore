@@ -83,6 +83,7 @@ data/
 *.parquet
 *.csv
 *.json
+*progress*.bin
 
 # Logs
 logs/

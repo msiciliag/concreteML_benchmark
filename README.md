@@ -36,7 +36,7 @@ The benchmark uses YAML configuration files to define experiments:
 
 - `exp_logistic_regression.yaml`: Benchmarks for Logistic Regression models
 - `exp_sdg_classifier.yaml`: Benchmarks for SGD Classifier models
-- `example_test_config.yaml`: Minimal example for testing
+- `example_tesst_config.yaml`: Minimal example for testing
 
 ## Requirements
 
@@ -46,11 +46,11 @@ The benchmark uses YAML configuration files to define experiments:
 - PyYAML
 - Click
 - MLflow
+- msgpack
 
 ## TODO
 
 ### *Urgent*
-- Implement a *KV store* and hash mechanism for progress tracking to avoid delays caused by large *JSON files* during extensive executions.
 - Add support for *neural networks*, ensuring differentiation between FHE and clear models during the fit process (quantization applied during fitting).
 - Provide a method to vary hyperparameters when the fit() function is called for *neural networks*.
 

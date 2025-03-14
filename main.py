@@ -9,25 +9,31 @@ from multiprocessing import Pool
 from itertools import repeat, product
 import importlib
 import os
-import json
+import msgpack
 import mlflow
 import importlib.metadata
-
-DEFAULT_PROGRESS_FILE = "progress.json"
+import hashlib
 
 def load_progress(progress_file):
     if os.path.exists(progress_file):
         try:
-            with open(progress_file, "r") as f:
-                return json.load(f)
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON progress file: {e}")
-            return {}
-    return {}
+            with open(progress_file, "rb") as f:
+                packed_data = f.read()
+                unpacked_data = msgpack.unpackb(packed_data, raw=False)
+                return set(unpacked_data)
+        except Exception as e:
+            print(f"Error retrieving progress file: {e}")
+            return set()
+    return set()
 
 def save_progress(progress, progress_file):
-    with open(progress_file, "w") as f:
-        json.dump(progress, f)
+    with open(progress_file, "wb") as f:
+        packed_data = msgpack.packb(list(progress), use_bin_type=True)
+        f.write(packed_data)
+
+def hash_config(config):
+    config_str = str(sorted(config.items()))
+    return hashlib.md5(config_str.encode()).hexdigest()
 
 def instantiate_models(model_config: dict, param_config: dict, fhe_config: dict):
     """Creates instances of the models with the given configuration"""
@@ -61,7 +67,6 @@ def log_system_info():
         "processor": platform.processor(),
         "ram": f"{round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / (1024. ** 3), 2)} GB"
     }
-    #print(system_info)
     for key, value in system_info.items():
         mlflow.log_param(key, value)
 
@@ -75,7 +80,7 @@ def log_library_versions():
         except importlib.metadata.PackageNotFoundError:
             mlflow.log_param(f"{library}_version", "not installed")
 
-def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: dict, progress_file: str):
+def experiment(task_config: dict, concreteml_config: dict, model_config: dict, progress: set, progress_file: str):
     """Run an experiment with the given configurations"""
     task_configs = [(elem["param"]["name"], expand_config_param(elem["param"]))
                     for elem in task_config["data"]["params"]]
@@ -93,9 +98,9 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
     
     for vals in product(*values):
         named_values = dict(zip(names, vals))
-        config_key = str(tuple(named_values.items()))
+        config_hash = hash_config(named_values)
         
-        if config_key in progress:
+        if config_hash in progress:
             print(f"Skipping already tested configuration: {named_values}")
             continue
         print(f"Running experiment with configuration: {named_values}")
@@ -178,8 +183,6 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 results["prediction_time_diff"] = results["prediction_time_fhe"] - results["prediction_time_clear"]
                 mlflow.log_metric("prediction_time_diff", results["prediction_time_diff"])
 
-                #print(results)
-
                 mlflow.end_run(status="FINISHED")
 
             except Exception as e:
@@ -193,14 +196,13 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 continue
 
             finally:
-
-                progress[config_key] = results
+                progress.add(config_hash)
                 save_progress(progress, progress_file)
 
 
 @click.command()
 @click.argument('config_file', type=click.Path(exists=True))
-@click.argument('progress_file', type=click.Path(), required=False, default=DEFAULT_PROGRESS_FILE)
+@click.argument('progress_file', type=click.Path(), required=False, default=None)
 @click.option('--clear-progress', is_flag=True, help='Clear progress and start from scratch.')
 def main(config_file, progress_file, clear_progress):
     """Main function to run the experiments"""
@@ -212,6 +214,9 @@ def main(config_file, progress_file, clear_progress):
     model_configs = [m["model"] for m in config["models"]]
     configs = list(zip(repeat(config["task"]), repeat(config["concreteml"]), model_configs))
     
+    if progress_file is None:
+        progress_file = f"{model_configs[0]['name']}_progress.bin"
+        
     progress = load_progress(progress_file)
     
     with Pool(n_models) as p:
