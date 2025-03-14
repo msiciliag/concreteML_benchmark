@@ -19,31 +19,28 @@ task:
       - param:
           name: 'n_samples'
           type: 'int'
-          values: [100, 500, 1000]
+          min: 2500
+          max: 20000       
+          step: 2500
       - param:
           name: 'n_features'
           type: 'int'
-          values: [5, 10, 20]
+          values: [10, 15, 20]
       - param:
           name: 'n_informative'
           type: 'int'
-          values: [2, 5]
-      - param:
-          name: 'n_redundant'
-          type: 'int'
-          values: [0, 1, 2]
+          values: [2, 5, 7]
       - param:
           name: 'random_state'
           type: 'int'
           values: [42]
-
 concreteml:
   model_params:
     - param: 
         name: 'n_bits'
         type: 'int'
         min: 2
-        max: 8
+        max: 15
         step: 1
 
 models:
@@ -56,19 +53,15 @@ models:
         - param:
             name: 'solver'
             type: 'str'
-            values: ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+            values: ['lbfgs', 'liblinear', 'newton-cg', 'sag', 'saga']
         - param:
             name: 'penalty'
             type: 'str'
-            values: ['l1', 'l2', 'elasticnet', 'none']
+            values: ['l1', 'l2', 'elasticnet'] #None] default is none
         - param:
             name: 'multi_class'
             type: 'str'
-            values: ['ovr', 'multinomial', 'auto']
-        - param:
-            name: 'C'
-            type: 'float'
-            values: [0.01, 0.1, 1, 10, 100]
+            values: ['auto', 'ovr', 'multinomial']
         - param:
             name: 'fit_intercept'
             type: 'bool'
@@ -76,12 +69,26 @@ models:
         - param:
             name: 'max_iter'
             type: 'int'
-            values: [100, 200, 300]
-        - param:
-            name: 'tol'
-            type: 'float'
-            values: [0.0001, 0.001, 0.01]
+            min: 100
+            max: 1000
+            step: 100
+        #- param:
+        #    name: 'class_weight'
+        #    type: 'dict'
+        #    values: ['balanced', 'None']
         - param:
             name: 'random_state'
             type: 'int'
             values: [42]
+        - param:
+            name: 'C'
+            type: 'float'
+            values: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+        - param:
+            name: 'tol'
+            type: 'float'
+            values: [0.0001, 0.001, 0.005, 0.01]
+        - param:
+            name: 'l1_ratio'
+            type: 'float'
+            values: [0.1, 0.3, 0.5, 0.7, 0.9]

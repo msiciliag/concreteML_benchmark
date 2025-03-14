@@ -55,6 +55,19 @@ The benchmark uses YAML configuration files to define experiments:
 - Provide a method to vary hyperparameters when the fit() function is called for *neural networks*.
 
 ### Least urgent
+
+#### Consider preprocessing function 
+For fixing specific parameters such as: 
+- *calculated n_informative* (and other make_classification() parameters)
+- *class_weight* (LogisticReegression)
+- *solver-penalty*  valid combinations (LogisticReegression)
+#### Others
+- Adjust min max step for floats, error:
+```bash
+return range(param['min'], param['max'], param['step'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'float' object cannot be interpreted as an integer
+```
 - Complete README.
 - Fix system specs logging.
 - Rewrite value list comprehensions over hyperparameters for readability.

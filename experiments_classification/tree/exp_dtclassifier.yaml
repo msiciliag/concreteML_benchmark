@@ -1,0 +1,60 @@
+task:
+  type: 'classification'
+  metrics:
+    - metric:
+        name: 'accuracy'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'accuracy_score'
+    - metric:
+        name: 'f1'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'f1_score'
+  data: 
+    type: 'synthetic'
+    params:
+      - param:
+          name: 'n_features'
+          type: 'int'
+          min: 5
+          max: 20
+          step: 1
+concreteml:
+  model_params:
+    - param: 
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 15
+        step: 1
+  # Add params for the compilation step? 
+models:
+  - model: 
+      name: 'DecisionTreeClassifier'
+      module_name: 'sklearn.tree'
+      fhe_name: 'DecisionTreeClassifier'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+        - param:
+            name: 'max_depth'
+            type: 'int'
+            min: 1
+            max: 10
+            step: 1
+  - model:
+      name: 'RandomForestClassifier'
+      module_name: 'sklearn.ensemble'
+      fhe_name: 'RandomForestClassifier'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+          - param:
+              name: 'n_estimators'
+              type: 'int'
+              min: 10
+              max: 100
+              step: 10
+          - param:
+              name: 'max_depth'
+              type: 'int'
+              min: 1
+              max: 10
+              step: 1
