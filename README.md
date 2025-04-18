@@ -51,6 +51,7 @@ The benchmark uses YAML configuration files to define experiments:
 ## TODO
 
 ### *Urgent*
+- Script parameters documentation.
 - Add support for *neural networks*, ensuring differentiation between FHE and clear models during the fit process (quantization applied during fitting).
 - Provide a method to vary hyperparameters when the fit() function is called for *neural networks*.
 
