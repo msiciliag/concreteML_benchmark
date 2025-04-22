@@ -1,0 +1,67 @@
+task:
+  type: 'classification'
+  metrics:
+    - metric:
+        name: 'accuracy'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'accuracy_score'
+    - metric:
+        name: 'f1'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'f1_score'
+  data: 
+    type: 'uci'
+    params:
+      - param:
+          name: 'id'
+          type: 'int'
+          values: [17]
+
+concreteml:
+  model_params:
+    - param: 
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 4
+        step: 1
+
+models:
+  - model: 
+      name: 'LogisticRegression'
+      module_name: 'sklearn.linear_model'
+      fhe_name: 'LogisticRegression'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+        - param:
+            name: 'solver'
+            type: 'str'
+            values: ['lbfgs', 'liblinear']
+        - param:
+            name: 'penalty'
+            type: 'str'
+            values: ['l2']
+        - param:
+            name: 'multi_class'
+            type: 'str'
+            values: ['ovr', 'multinomial']
+        - param:
+            name: 'C'
+            type: 'float'
+            values: [1.0, 0.1]
+        - param:
+            name: 'fit_intercept'
+            type: 'bool'
+            values: [True]
+        - param:
+            name: 'max_iter'
+            type: 'int'
+            values: [100]
+        - param:
+            name: 'tol'
+            type: 'float'
+            values: [0.0001]
+        - param:
+            name: 'random_state'
+            type: 'int'
+            values: [42]

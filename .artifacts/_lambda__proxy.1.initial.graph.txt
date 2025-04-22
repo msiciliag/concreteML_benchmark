@@ -1,0 +1,25 @@
+ %0 = _inputs                                            # EncryptedTensor<uint19, shape=(1, 30)>
+ %1 = transpose(%0)                                      # EncryptedTensor<uint1, shape=(30, 1)>
+ %2 = [[0 0 0 0  ...  0 0 0 0]]                          # ClearTensor<uint1, shape=(15, 30)>
+ %3 = matmul(%2, %1)                                     # EncryptedTensor<uint5, shape=(15, 1)>
+ %4 = 1                                                  # ClearScalar<uint1>
+ %5 = multiply(%4, %3)                                   # EncryptedTensor<uint1, shape=(15, 1)>
+ %6 = 0                                                  # ClearScalar<uint1>
+ %7 = add(%5, %6)                                        # EncryptedTensor<uint2, shape=(15, 1)>
+ %8 = [[267251]  ...  [388604]]                          # ClearTensor<uint20, shape=(15, 1)>
+ %9 = subtract(%8, %7)                                   # EncryptedTensor<uint1, shape=(15, 1)>
+%10 = truncate_bit_pattern(%9, lsbs_to_remove=21)        # EncryptedTensor<uint1, shape=(15, 1)>
+%11 = 0                                                  # ClearScalar<uint1>
+%12 = greater_equal(%10, %11)                            # EncryptedTensor<uint1, shape=(15, 1)>
+%13 = reshape(%12, newshape=[ 1 15 -1])                  # EncryptedTensor<uint1, shape=(1, 15, 1)>
+%14 = [[[ 1  1   ... 0 -1  0]]]                          # ClearTensor<int2, shape=(1, 16, 15)>
+%15 = matmul(%14, %13)                                   # EncryptedTensor<uint4, shape=(1, 16, 1)>
+%16 = reshape(%15, newshape=[16 -1])                     # EncryptedTensor<uint1, shape=(16, 1)>
+%17 = [[6] [5] [ ... ] [1] [0]]                          # ClearTensor<uint3, shape=(16, 1)>
+%18 = equal(%17, %16)                                    # EncryptedTensor<uint1, shape=(16, 1)>
+%19 = reshape(%18, newshape=[ 1 16 -1])                  # EncryptedTensor<uint1, shape=(1, 16, 1)>
+%20 = [[[1048575 ... 1048575]]]                          # ClearTensor<uint20, shape=(1, 2, 16)>
+%21 = matmul(%20, %19)                                   # EncryptedTensor<uint5, shape=(1, 2, 1)>
+%22 = reshape(%21, newshape=[ 1  2 -1])                  # EncryptedTensor<uint1, shape=(1, 2, 1)>
+%23 = transpose(%22, axes=(2, 1, 0))                     # EncryptedTensor<uint1, shape=(1, 2, 1)>
+return %23

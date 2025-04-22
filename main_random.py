@@ -6,6 +6,8 @@ import platform
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from ucimlrepo import fetch_ucirepo
 from multiprocessing import Pool
 from itertools import repeat
 import importlib
@@ -123,8 +125,18 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                                                     fhe_config={k: v for k, v in named_values.items() if k in concreteml_model_config_names})
                 
                 dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
-                X, y = make_classification(**dataset_config)
-                X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+                if task_config["data"]["type"] == "synthetic":
+                    X, y = make_classification(**dataset_config)
+                elif task_config["data"]["type"] == "uci":
+                    uci_ds = fetch_ucirepo(**dataset_config)
+                    X = uci_ds.data.features
+                    y = uci_ds.data.targets
+                    le = LabelEncoder()
+                    y = le.fit_transform(y.values.ravel())
+                else:
+                    raise ValueError(f"Unknown data type: {task_config['data']['type']}")
+                    
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
                 
                 
                 experiment_name = f"{model_config['name']} Random Benchmark"
