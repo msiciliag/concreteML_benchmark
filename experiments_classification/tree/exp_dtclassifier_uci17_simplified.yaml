@@ -1,0 +1,39 @@
+task:
+  type: 'classification'
+  
+  metrics:
+    - metric: { name: 'accuracy', module_name: 'sklearn.metrics', fhe_name: 'accuracy_score' }
+    - metric: { name: 'f1', module_name: 'sklearn.metrics', fhe_name: 'f1_score' }
+    - metric: { name: 'roc_auc', module_name: 'sklearn.metrics', fhe_name: 'roc_auc_score' }
+  data:
+    type: 'uci'
+    params:
+      - param: { name: 'id', type: 'int', values: [17] }
+
+concreteml:
+  model_params:
+
+    - param:
+        name: 'n_bits'
+        type: 'int'
+        min: 2
+        max: 16
+        step: 1 
+
+models:
+  - model:
+      name: 'DecisionTreeClassifier'
+      module_name: 'sklearn.tree'
+      fhe_name: 'DecisionTreeClassifier'
+      fhe_module_name: 'concrete.ml.sklearn.tree'
+      params:
+
+        - param:
+            name: 'max_depth'
+            type: 'int_or_none' 
+            values: [3, 5, 7, 10, 15] 
+
+        - param:
+            name: 'min_samples_leaf'
+            type: 'int'
+            values: [1, 3, 5, 10]

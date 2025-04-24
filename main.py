@@ -129,8 +129,11 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                     raise ValueError(f"Unknown data type: {task_config['data']['type']}")
                     
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-                        
-                experiment_name = f"{model_config['name']} Benchmark"
+
+                if dataset_config['id']:
+                    experiment_name = f"{model_config['name']} {dataset_config['id']} Benchmark"
+                else:
+                    experiment_name = f"{model_config['name']} Benchmark"
                 mlflow.set_experiment(experiment_name)
                 
                 for param_name, param_value in named_values.items():

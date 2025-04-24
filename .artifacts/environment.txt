@@ -1,2 +1,2 @@
-macOS-15.4.1-x86_64-i386-64bit Darwin Kernel Version 24.4.0: Fri Apr 11 18:28:23 PDT 2025; root:xnu-11417.101.15~117/RELEASE_X86_64
+Linux-4.19.128-microsoft-standard-x86_64-with-glibc2.39 #1 SMP Tue Jun 23 12:58:10 UTC 2020
 Python 3.11.11
