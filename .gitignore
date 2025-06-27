@@ -92,3 +92,6 @@ logs/
 # Environment variables
 .env
 .env.*
+
+# Saves and checkpoints
+*.bin

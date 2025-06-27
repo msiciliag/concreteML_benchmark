@@ -1,0 +1,65 @@
+task:
+  type: 'classification'
+  metrics:
+    - metric:
+        name: 'accuracy'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'accuracy_score'
+    - metric:
+        name: 'f1'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'f1_score'
+    - metric:
+        name: 'precision'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'precision_score'
+    - metric:
+        name: 'recall'
+        module_name: 'sklearn.metrics'
+        fhe_name: 'recall_score'
+  data: 
+    type: 'uci'
+    params:
+      - param:
+          name: 'id'
+          type: 'int'
+          values: [17]
+
+concreteml:
+  model_params:
+    - param: 
+        name: 'n_bits'
+        type: 'int'
+        values: [2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15]
+
+models:
+  - model: 
+      name: 'RandomForestClassifier'
+      module_name: 'sklearn.ensemble'
+      fhe_name: 'RandomForestClassifier'
+      fhe_module_name: 'concrete.ml.sklearn'
+      params: 
+        - param:
+            name: 'n_estimators'
+            type: 'int'
+            values: [50, 100]
+        - param:
+            name: 'max_depth'
+            type: 'int'
+            values: [3, 5] 
+        - param:
+            name: 'random_state'
+            type: 'int'
+            values: [42]
+        - param:
+            name: 'max_features'
+            type: 'str'
+            values: ['sqrt'] 
+        - param:
+            name: 'bootstrap'
+            type: 'bool'
+            values: [true] 
+        - param:
+            name: 'criterion'
+            type: 'str'
+            values: ['gini'] 

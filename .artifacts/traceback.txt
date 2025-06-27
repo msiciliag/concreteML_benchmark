@@ -1,55 +1,16 @@
 Traceback (most recent call last):
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/module_compiler.py", line 423, in compile
-    ).convert_many(graphs, mlir_context)
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/converter.py", line 106, in convert_many
-    @func.FuncOp.from_py_func(*input_types, name=name)
-     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/mlir/dialects/_func_ops_ext.py", line 187, in decorator
-    return_values = f(*func_args, **func_kwargs)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/converter.py", line 129, in main
-    self.node(ctx, node, preds)
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/converter.py", line 310, in node
-    conversion = converter(ctx, node, preds)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/converter.py", line 467, in greater_equal
-    return self.tlu(ctx, node, preds)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/converter.py", line 803, in tlu
-    ctx.error(highlights)
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/mlir/context.py", line 272, in error
-    GraphProcessor.error(self.graph, highlights)
-  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/representation/graph.py", line 1040, in error
-    raise RuntimeError(message)
-RuntimeError: Function you are trying to compile cannot be compiled
-
- %0 = _inputs                                            # EncryptedTensor<uint15, shape=(1, 30)>          ∈ [0, 32767]
- %1 = transpose(%0)                                      # EncryptedTensor<uint15, shape=(30, 1)>          ∈ [0, 32767]
- %2 = [[0 0 0 1  ...  0 0 0 0]]                          # ClearTensor<uint1, shape=(4, 30)>               ∈ [0, 1]
- %3 = matmul(%2, %1)                                     # EncryptedTensor<uint15, shape=(4, 1)>           ∈ [0, 32767]
- %4 = 1                                                  # ClearScalar<uint1>                              ∈ [1, 1]
- %5 = multiply(%4, %3)                                   # EncryptedTensor<uint15, shape=(4, 1)>           ∈ [0, 32767]
- %6 = 0                                                  # ClearScalar<uint1>                              ∈ [0, 0]
- %7 = add(%5, %6)                                        # EncryptedTensor<uint15, shape=(4, 1)>           ∈ [0, 32767]
- %8 = [[12347] [ ... ] [ 7855]]                          # ClearTensor<uint14, shape=(4, 1)>               ∈ [7855, 12347]
- %9 = subtract(%8, %7)                                   # EncryptedTensor<int16, shape=(4, 1)>            ∈ [-24912, 12347]
-%10 = truncate_bit_pattern(%9, lsbs_to_remove=16)        # EncryptedTensor<int17, shape=(4, 1)>            ∈ [-65536, 0]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this 17-bit value is used as an input to a table lookup
-                                                                                                                         /root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/ml/onnx/onnx_impl_utils.py:261
-%11 = 0                                                  # ClearScalar<uint1>                              ∈ [0, 0]
-%12 = greater_equal(%10, %11)                            # EncryptedTensor<uint1, shape=(4, 1)>            ∈ [0, 1]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ but only up to 16-bit table lookups are supported
-                                                                                                                    /root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/ml/onnx/ops_impl.py:1172
-%13 = reshape(%12, newshape=[ 1  4 -1])                  # EncryptedTensor<uint1, shape=(1, 4, 1)>         ∈ [0, 1]
-%14 = [[[ 1  1   ... 0  0  0]]]                          # ClearTensor<int2, shape=(1, 5, 4)>              ∈ [-1, 1]
-%15 = matmul(%14, %13)                                   # EncryptedTensor<int3, shape=(1, 5, 1)>          ∈ [-1, 3]
-%16 = reshape(%15, newshape=[ 5 -1])                     # EncryptedTensor<int3, shape=(5, 1)>             ∈ [-1, 3]
-%17 = [[3] [2] [2] [1] [0]]                              # ClearTensor<uint2, shape=(5, 1)>                ∈ [0, 3]
-%18 = equal(%17, %16)                                    # EncryptedTensor<uint1, shape=(5, 1)>            ∈ [0, 1]
-%19 = reshape(%18, newshape=[ 1  5 -1])                  # EncryptedTensor<uint1, shape=(1, 5, 1)>         ∈ [0, 1]
-%20 = [[[31553 2 ... 1 32767]]]                          # ClearTensor<uint15, shape=(1, 2, 5)>            ∈ [0, 32767]
-%21 = matmul(%20, %19)                                   # EncryptedTensor<uint15, shape=(1, 2, 1)>        ∈ [0, 32767]
-%22 = reshape(%21, newshape=[ 1  2 -1])                  # EncryptedTensor<uint15, shape=(1, 2, 1)>        ∈ [0, 32767]
-%23 = transpose(%22, axes=(2, 1, 0))                     # EncryptedTensor<uint15, shape=(1, 2, 1)>        ∈ [0, 32767]
-return %23
+  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/module_compiler.py", line 437, in compile
+    output = FheModule(
+             ^^^^^^^^^^
+  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/module.py", line 759, in __init__
+    self.execution_runtime.init()
+  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/utils.py", line 58, in init
+    self._val = self._init()
+                ^^^^^^^^^^^^
+  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/module.py", line 738, in init_execution
+    execution_server = Server.create(
+                       ^^^^^^^^^^^^^^
+  File "/root/concreteML_benchmark/.venv/lib/python3.11/site-packages/concrete/fhe/compilation/server.py", line 213, in create
+    library = compiler.compile(
+              ^^^^^^^^^^^^^^^^^
+RuntimeError: NoParametersFound

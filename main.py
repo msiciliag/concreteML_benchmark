@@ -15,6 +15,7 @@ import msgpack
 import mlflow
 import importlib.metadata
 import hashlib
+import concrete.compiler as cc
 
 def load_progress(progress_file):
     if os.path.exists(progress_file):
@@ -108,6 +109,14 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
         print(f"Running experiment with configuration: {named_values}")
 
         results = {}
+        
+        # Set the experiment name BEFORE starting the run
+        dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
+        if 'id' in dataset_config and dataset_config['id']:
+            experiment_name = f"{model_config['name']} {dataset_config['id']} Benchmark"
+        else:
+            experiment_name = f"{model_config['name']} Benchmark"
+        mlflow.set_experiment(experiment_name)
 
         with mlflow.start_run():
 
@@ -129,12 +138,6 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                     raise ValueError(f"Unknown data type: {task_config['data']['type']}")
                     
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-
-                if dataset_config['id']:
-                    experiment_name = f"{model_config['name']} {dataset_config['id']} Benchmark"
-                else:
-                    experiment_name = f"{model_config['name']} Benchmark"
-                mlflow.set_experiment(experiment_name)
                 
                 for param_name, param_value in named_values.items():
                     mlflow.log_param(param_name, param_value)
@@ -170,7 +173,9 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 mlflow.log_metric("train_time_fhe", results["train_time_fhe"])
                 
                 tic = time.perf_counter()
-                fhe_model.compile(X_train)
+                print("GPU enabled:", cc.check_gpu_enabled())
+                print("GPU available:", cc.check_gpu_available())
+                fhe_model.compile(X_train, device='cuda')
                 toc = time.perf_counter()
                 results["compilation_time"] = toc - tic
                 mlflow.log_metric("compilation_time", results["compilation_time"])

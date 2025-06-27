@@ -12,4 +12,5 @@ dependencies = [
     "mlflow",
     "ucimlrepo>=0.0.7",
     "msgpack>=1.1.0",
+    "concrete-python>=2.9.0",
 ]

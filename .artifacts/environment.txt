@@ -1,2 +1,2 @@
-Linux-4.19.128-microsoft-standard-x86_64-with-glibc2.39 #1 SMP Tue Jun 23 12:58:10 UTC 2020
+Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025
 Python 3.11.11
