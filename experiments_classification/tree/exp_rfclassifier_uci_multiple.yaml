@@ -1,5 +1,5 @@
 task:
-  type: 'classification'
+  type: 'Classification'
   metrics:
     - metric:
         name: 'accuracy'
@@ -18,34 +18,19 @@ task:
         module_name: 'sklearn.metrics'
         fhe_name: 'recall_score'
   data: 
-    type: 'synthetic'
+    type: 'uci'
     params:
       - param:
-          name: 'n_samples'
+          name: 'id'
           type: 'int'
-          values: [5000]
-      - param:
-          name: 'n_features'
-          type: 'int'
-          values: [10]
-      - param:
-          name: 'n_informative'
-          type: 'int'
-          values: [4]
-      - param:
-          name: 'n_redundant'
-          type: 'int'
-          values: [0]
-      - param:
-          name: 'random_state'
-          type: 'int'
-          values: [42]
+          values: 'a'
+
 concreteml:
   model_params:
     - param: 
         name: 'n_bits'
         type: 'int'
-        values: [2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15]
+        values: [2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15]
 
 models:
   - model: 

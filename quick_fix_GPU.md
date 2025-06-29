@@ -19,3 +19,17 @@ and runnning with:
 python main.py experiments_classification/tree/exp_rfclassifier_uci329.yaml --clear-progress uci329rfc.bin
 python main.py experiments_classification/tree/exp_rfclassifier_uci17.yaml --clear-progress uci17rfc.bin
 ```
+
+Then change:
+```bash
+fhe_model.compile(X_train) 
+```
+to
+```bash
+import concrete.compiler as cc
+print("GPU enabled:", cc.check_gpu_enabled())
+print("GPU available:", cc.check_gpu_available())
+fhe_model.compile(X_train, device='cuda')
+```
+
+

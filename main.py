@@ -15,7 +15,6 @@ import msgpack
 import mlflow
 import importlib.metadata
 import hashlib
-import concrete.compiler as cc
 
 def load_progress(progress_file):
     if os.path.exists(progress_file):
@@ -110,7 +109,6 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
 
         results = {}
         
-        # Set the experiment name BEFORE starting the run
         dataset_config = {k: v for k, v in named_values.items() if k in task_config_names}
         if 'id' in dataset_config and dataset_config['id']:
             experiment_name = f"{model_config['name']} {dataset_config['id']} Benchmark"
@@ -173,9 +171,7 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 mlflow.log_metric("train_time_fhe", results["train_time_fhe"])
                 
                 tic = time.perf_counter()
-                print("GPU enabled:", cc.check_gpu_enabled())
-                print("GPU available:", cc.check_gpu_available())
-                fhe_model.compile(X_train, device='cuda')
+                fhe_model.compile(X_train)
                 toc = time.perf_counter()
                 results["compilation_time"] = toc - tic
                 mlflow.log_metric("compilation_time", results["compilation_time"])
