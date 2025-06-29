@@ -193,6 +193,8 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 toc = time.perf_counter()
                 results["prediction_time_clear"] = toc - tic
                 mlflow.log_metric("prediction_time_clear", results["prediction_time_clear"])
+                results["average_prediction_time_clear"] = results["prediction_time_clear"] / len(y_test)
+                mlflow.log_metric("average_prediction_time_clear", results["average_prediction_time_clear"])
                 
                 results["accuracy_clear"] = accuracy_score(y_test, y_pred_clear)
                 mlflow.log_metric("accuracy_clear", results["accuracy_clear"])
@@ -221,6 +223,8 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 toc = time.perf_counter()
                 results["prediction_time_fhe"] = toc - tic
                 mlflow.log_metric("prediction_time_fhe", results["prediction_time_fhe"])
+                results["average_prediction_time_fhe"] = results["prediction_time_fhe"] / len(y_test)
+                mlflow.log_metric("average_prediction_time_fhe", results["average_prediction_time_fhe"])
                 
                 results["accuracy_fhe"] = accuracy_score(y_test, y_pred_fhe)
                 mlflow.log_metric("accuracy_fhe", results["accuracy_fhe"])
@@ -238,6 +242,8 @@ def experiment(task_config: dict, concreteml_config: dict, model_config: dict, p
                 mlflow.log_metric("auc_diff", results["auc_diff"])
                 results["prediction_time_diff"] = results["prediction_time_fhe"] - results["prediction_time_clear"]
                 mlflow.log_metric("prediction_time_diff", results["prediction_time_diff"])
+                results["average_prediction_time_diff"] = results["average_prediction_time_fhe"] - results["average_prediction_time_clear"]
+                mlflow.log_metric("average_prediction_time_diff", results["average_prediction_time_diff"])
 
                 print(results)
                 mlflow.end_run(status="FINISHED")
