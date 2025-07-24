@@ -77,7 +77,7 @@ A minimal test configuration is also available at `example_test_config.yaml`.
 
 ### UCI Dataset Variations
 
-In addition to the base configurations, you will find specialized files for running benchmarks on datasets from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). These files are named with a `_uci` suffix followed by a dataset ID number (e.g., `exp_dtclassifier_uci17.yaml`). This allows for standardized testing on well-known datasets. The `ucimlrepo` library is used to fetch the data automatically.
+In addition to the base configurations, you will find specialized files for running benchmarks on datasets from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). These files are named with a `_uci` suffix followed by a dataset ID number (e.g., `exp_dtclassifier_uci17.yaml`). The `ucimlrepo` library is used to fetch the data automatically.
 
 ### Create new experiment configurations
 For more details on how to create new experiment configurations, see the [experiment examples README](./experiment_examples/README.md).
