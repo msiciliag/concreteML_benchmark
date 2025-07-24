@@ -71,7 +71,7 @@ Below is a list of the primary example configurations available:
     -   `exp_xgbclassifier.yaml`: For XGBoost classifiers.
 -   **Other Models**:
     -   `experiments_classification/nearestneighbors/exp_kneighborsclassifier.yaml`: For K-Nearest Neighbors.
-    -   `experiments_classification/neuralnet/exp_neuralnetclassifier.yaml`: For a simple Neural Network classifier.
+    -   TODO: `experiments_classification/neuralnet/exp_neuralnetclassifier.yaml`: For a simple Neural Network classifier.
 
 A minimal test configuration is also available at `example_test_config.yaml`.
 
@@ -98,7 +98,7 @@ For more details on how to create new experiment configurations, see the [experi
 
 ### Urgent
 ### Add neural network model benchmarks
-- Implement neural network benchmarks using `NeuralNetClassifier` from `concrete.ml.sklearn`.
+- Implement neural network benchmarks using `NeuralNetClassifier` from `concrete.ml.sklearn` and basic sklearn in comparison.
 - Ensure compatibility with FHE and standard scikit-learn interfaces.
 
 ### Less urgent
