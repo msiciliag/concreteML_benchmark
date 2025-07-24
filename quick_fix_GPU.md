@@ -21,15 +21,19 @@ python main.py experiments_classification/tree/exp_rfclassifier_uci17.yaml --cle
 ```
 
 Then change:
-```bash
+```python
 fhe_model.compile(X_train) 
 ```
 to
-```bash
+```python
+fhe_model.compile(X_train, device='cuda')
+```
+
+To check if GPU is available, you can use the following code:
+```python
 import concrete.compiler as cc
 print("GPU enabled:", cc.check_gpu_enabled())
 print("GPU available:", cc.check_gpu_available())
-fhe_model.compile(X_train, device='cuda')
 ```
 
 

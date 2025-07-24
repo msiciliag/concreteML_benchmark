@@ -1,0 +1,29 @@
+
+task:
+  data:
+    type: synthetic
+    params:
+      - param:
+          name: n_samples
+          values: [100, 200]
+      - param:
+          name: n_features
+          values: [10, 20]
+  type: classification
+
+concreteml:
+  model_params:
+    - param:
+        name: n_bits
+        values: [6, 7]
+
+models:
+  - model:
+      name: LogisticRegression
+      module_name: sklearn.linear_model
+      fhe_name: LogisticRegression
+      fhe_module_name: concrete.ml.sklearn
+      params:
+        - param:
+            name: C
+            values: [1.0, 2.0]

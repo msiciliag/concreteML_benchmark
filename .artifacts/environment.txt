@@ -1,2 +1,2 @@
-Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025
+macOS-15.5-x86_64-i386-64bit Darwin Kernel Version 24.5.0: Tue Apr 22 19:53:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_X86_64
 Python 3.11.11
